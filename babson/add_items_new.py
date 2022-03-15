@@ -136,8 +136,8 @@ def parse_fixture(d, out_filename):
     out_file.close()
     
 def main():
-    df = pd.read_excel(r'MenuWorks_FDA_Menu_Main.xlsx',skiprows = 11)
-    dfa = pd.read_excel(r'MenuWorks_FDA_Menu_Alt.xlsx',skiprows = 11)
+    df = pd.read_excel(r'nutrition/MenuWorks_FDA_Menu_Main_W9-11_2022.xlsx',skiprows = 11)
+    dfa = pd.read_excel(r'nutrition/MenuWorks_FDA_Menu_Alt_W9-11_2022.xlsx',skiprows = 11)
 
     df, dfa, df_combine =  nutrition_fact_table(df, dfa)
     df_combine['pk'] = range(1000, 1000+len(df_combine))
