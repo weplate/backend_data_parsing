@@ -1,0 +1,9 @@
+# Python-related
+*.py[co]
+__pycache__
+venv/
+
+# Excel-related
+
+# IDE
+.idea/
