@@ -3,7 +3,7 @@ import numpy as np
 import re
 import json
 
-OUT_FILE_PATH = 'meal_items.json'
+OUT_FILE_PATH = 'meal_items.yaml'
 SCHOOL_ID = 10
 
 def clean_nutrition_table_tail(dfc):
@@ -136,12 +136,15 @@ def parse_fixture(d, out_filename):
     out_file.close()
     
 def main():
-    df = pd.read_excel(r'nutrition/MenuWorks_FDA_Menu_Main_W9-11_2022.xlsx',skiprows = 11)
-    dfa = pd.read_excel(r'nutrition/MenuWorks_FDA_Menu_Alt_W9-11_2022.xlsx',skiprows = 11)
+    df = pd.read_excel(r'nutrition/MenuWorks_FDA_Menu_Main_W9-11_2022.xlsx',skiprows = 11,
+    converters={'Recipe Number': lambda x: str(x)})
+    dfa = pd.read_excel(r'nutrition/MenuWorks_FDA_Menu_Alt_W9-11_2022.xlsx',skiprows = 11,
+    converters={'Recipe Number': lambda x: str(x)})
 
     df, dfa, df_combine =  nutrition_fact_table(df, dfa)
     df_combine['pk'] = range(1000, 1000+len(df_combine))
     df_combine['school'] = [SCHOOL_ID for ii in range(len(df_combine)) ]
+    df_combine.to_csv('Nutrition_Table_W9-11_2022.csv')
     parse_fixture(df_combine, OUT_FILE_PATH)
 
 if __name__ == '__main__':
