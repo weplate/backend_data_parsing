@@ -136,10 +136,15 @@ def parse_fixture(d, out_filename):
     out_file.close()
     
 def main():
+<<<<<<< HEAD:babson/add_items.py
     df = pd.read_excel(r'nutrition/MenuWorks_FDA_Menu_Main_W9-11_2022.xlsx',skiprows = 11,
     converters={'Recipe Number': lambda x: str(x)})
     dfa = pd.read_excel(r'nutrition/MenuWorks_FDA_Menu_Alt_W9-11_2022.xlsx',skiprows = 11,
     converters={'Recipe Number': lambda x: str(x)})
+=======
+    df = pd.read_excel(r'nutrition/MenuWorks_FDA_Menu_Main_W9-11_2022.xlsx',skiprows = 11,converters={'Recipe Number': lambda x: str(x)})
+    dfa = pd.read_excel(r'nutrition/MenuWorks_FDA_Menu_Alt_W9-11_2022.xlsx',skiprows = 11,converters={'Recipe Number': lambda x: str(x)})
+>>>>>>> c17bbccf8fbb953b113a1857fdd74367fc7c654c:babson/add_items_new.py
 
     df, dfa, df_combine =  nutrition_fact_table(df, dfa)
     df_combine['pk'] = range(1000, 1000+len(df_combine))
