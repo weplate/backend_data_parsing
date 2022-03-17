@@ -20,7 +20,6 @@ def clean_nutrition_table_tail(dfc):
     dfc.drop(range(min(remove_row),len(dfc)), inplace=True)
     return dfc
 
-
 def clean_nutrient1(z):
     null = None
     if z == '-':
@@ -31,6 +30,13 @@ def clean_nutrient1(z):
     else:
         z = z.strip('+')
         return float(z)
+
+def clean_category(z):
+    null = None
+    if z == '-':
+        return null
+    else:
+        return z.lower()
     
 bad_units = set()
 def clean_portion(z):
@@ -55,7 +61,9 @@ def nutrition_fact_table(df, df1):
     df = clean_nutrition_table_tail(df)
     df.drop(['Magnesium (mg)', 'Weight (oz)', 'Calories from Fat'], axis=1, inplace=True)
 
-    rows_nan = np.array(df.isnull().any(axis=1))
+    k = list(df.keys())
+    k.remove('Recipe Name')
+    rows_nan = np.array(df[k].isnull().all(axis=1))
     section_rows = list(np.where(rows_nan == True)[0])
     MEAL_TYPES=[]
     for i in range(len(section_rows)):
@@ -95,7 +103,8 @@ def nutrition_fact_table(df, df1):
     
     df_all.drop_duplicates(inplace=True)
     df_all = df_all.reset_index(drop=True)
-    df_all['category'] = df_all['category'].apply(lambda z: z.lower())
+    df_all['category']=df_all['category'].fillna('-')
+    df_all['category'] = df_all['category'].apply(lambda z: clean_category(z))
     
     df_all['vitamin_c'] = df_all['vitamin_c'].apply(lambda z: clean_nutrient1(str(z)))
     df_all['vitamin_d'] = df_all['vitamin_d'].apply(lambda z: clean_nutrient1(str(z)))
@@ -136,15 +145,8 @@ def parse_fixture(d, out_filename):
     out_file.close()
     
 def main():
-<<<<<<< HEAD:babson/add_items.py
-    df = pd.read_excel(r'nutrition/MenuWorks_FDA_Menu_Main_W9-11_2022.xlsx',skiprows = 11,
-    converters={'Recipe Number': lambda x: str(x)})
-    dfa = pd.read_excel(r'nutrition/MenuWorks_FDA_Menu_Alt_W9-11_2022.xlsx',skiprows = 11,
-    converters={'Recipe Number': lambda x: str(x)})
-=======
     df = pd.read_excel(r'nutrition/MenuWorks_FDA_Menu_Main_W9-11_2022.xlsx',skiprows = 11,converters={'Recipe Number': lambda x: str(x)})
     dfa = pd.read_excel(r'nutrition/MenuWorks_FDA_Menu_Alt_W9-11_2022.xlsx',skiprows = 11,converters={'Recipe Number': lambda x: str(x)})
->>>>>>> c17bbccf8fbb953b113a1857fdd74367fc7c654c:babson/add_items_new.py
 
     df, dfa, df_combine =  nutrition_fact_table(df, dfa)
     df_combine['pk'] = range(1000, 1000+len(df_combine))
