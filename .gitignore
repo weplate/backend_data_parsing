@@ -3,7 +3,10 @@
 __pycache__
 venv/
 
-# Excel-related
-
 # IDE
 .idea/
+
+# Output files
+babson/meal_items.json
+babson/menu_items.json
+babson/Nutrition_Table_W9-11_2022.csv
