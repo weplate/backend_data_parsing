@@ -141,11 +141,11 @@ def parse_fixture(d, out_filename):
     json_list = []
 
     for r in range(len(result)):
-        data = {'model': 'backend.MealItem', 'pk': {}, 'field': {}}
+        data = {'model': 'backend.MealItem', 'pk': {}, 'fields': {}}
         f = result[r]
         data['pk'] = f['pk']
         f.pop('pk')
-        data['field'] = f
+        data['fields'] = f
         json_list.append(data)
 
     with open(out_filename, 'w') as out_file:
