@@ -4,6 +4,7 @@ import re
 import json
 
 OUT_FILE_PATH = 'meal_items.json'
+OUT_FILE_NUTRITION = 'latest_nutrition_table.csv'
 SCHOOL_ID = 10
 
 
@@ -177,6 +178,7 @@ def main():
     df, dfa, df_combine = nutrition_fact_table(df, dfa)
     df_combine['pk'] = range(1000, 1000 + len(df_combine))
     df_combine['school'] = [SCHOOL_ID for ii in range(len(df_combine))]
+    df_combine.to_csv(OUT_FILE_NUTRITION)
     parse_fixture(df_combine, OUT_FILE_PATH)
 
 
