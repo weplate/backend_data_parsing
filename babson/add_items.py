@@ -116,14 +116,15 @@ def nutrition_fact_table(df, df1):
     df_all['carbohydrate'] = df_all['carbohydrate'].apply(lambda z: clean_nutrient1(str(z)))
 
     df_all['portion_volume'] = df_all['portion_volume'].apply(lambda z: clean_portion(z))
-    df_all['portion_size'] = df_all['portion_size'].apply(lambda z: float(z.strip('g')))
+    df_all['portion_weight'] = df_all['portion_weight'].apply(lambda z: float(z.strip('g')))
 
     df_all['station'] = df_all['station'].apply(lambda z: z.split('-')[1].strip())
 
     df_all.drop(df_all[df_all.portion_volume.isnull()].index, inplace=True)
     df_all = df_all.reset_index(drop=True)
 
-    df_all = df_all.replace({np.nan: None})
+    df_all = df_all.replace({np.nan: 0})
+    #df_all = df_all.replace({np.nan: None})
 
     return df, df1, df_all
 
@@ -133,11 +134,12 @@ def parse_fixture(d, out_filename):
     json_list = []
 
     for r in range(len(result)):
-        data = {'model': 'backend.MealItem', 'pk': {}, 'field': {}}
+        data = {'model': 'backend.MealItem', 'pk': {}, 'fields': {}}
         f = result[r]
         data['pk'] = f['pk']
         f.pop('pk')
-        data['field'] = f
+        f['version'] = 101
+        data['fields'] = f
         json_list.append(data)
 
     with open(out_filename, 'w') as out_file:
