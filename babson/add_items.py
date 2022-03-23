@@ -4,7 +4,7 @@ import re
 import json
 
 OUT_FILE_PATH = 'meal_items.json'
-OUT_FILE_NUTRITION = 'latest_nutrition_table.csv'
+NUTRITION_TABLE = 'master_nutrition/nutrition_table.csv'
 SCHOOL_ID = 10
 
 
@@ -67,11 +67,12 @@ def clean_portion(z):
         return null
 
 
-def nutrition_fact_table(df, df1):
+def nutrition_fact_table(df, df1, dfn):
     df = clean_nutrition_table_tail(df)
     try:
         df.drop(['Magnesium (mg)', 'Weight (oz)', 'Calories from Fat'], axis=1, inplace=True)
     except:
+        #df.drop(['Weight (oz)'], axis=1, inplace=True)
         df.drop(['Weight (oz)', 'Cholesterol (mg)'], axis=1, inplace=True)
 
     k = list(df.keys())
@@ -146,6 +147,7 @@ def nutrition_fact_table(df, df1):
     df_all = df_all.reset_index(drop=True)
 
     df_all = df_all.replace({np.nan: 0})
+    df_all = pd.concat([dfn, df_all]).drop_duplicates().reset_index(drop=True)
     #df_all = df_all.replace({np.nan: None})
 
     return df, df1, df_all
@@ -175,10 +177,19 @@ def main():
     dfa = pd.read_excel(r'nutrition/MenuWorks_FDA_Menu_Alt_W11_2022.xlsx', skiprows=11,
     converters={'Recipe Number': lambda x: str(x)})
 
-    df, dfa, df_combine = nutrition_fact_table(df, dfa)
+    #df = pd.read_excel(r'nutrition/MenuWorks_FDA_Menu_Main_W9-11_2022.xlsx', skiprows=11, 
+    #converters={'Recipe Number': lambda x: str(x), 'category': lambda x: str(x)})
+    #dfa = pd.read_excel(r'nutrition/MenuWorks_FDA_Menu_Alt_W9-11_2022.xlsx', skiprows=11,
+    #converters={'Recipe Number': lambda x: str(x)})
+    try:
+        dfn = pd.read_csv(NUTRITION_TABLE)
+        dfn.drop(['pk', 'school'], axis=1, inplace=True)
+    except:
+        dfn = pd.DataFrame()
+    df, dfa, df_combine = nutrition_fact_table(df, dfa, dfn)
     df_combine['pk'] = range(1000, 1000 + len(df_combine))
     df_combine['school'] = [SCHOOL_ID for ii in range(len(df_combine))]
-    df_combine.to_csv(OUT_FILE_NUTRITION)
+    df_combine.to_csv(NUTRITION_TABLE, index=False)
     parse_fixture(df_combine, OUT_FILE_PATH)
 
 

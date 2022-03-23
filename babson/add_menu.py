@@ -109,7 +109,7 @@ def weekly_menu_dict(dfm, dfd, row_begin, row_end, pk_begin):
 
 def main():
     #dfd = pd.read_csv(r'Nutrition_Table_W9-11_2022.csv', converters={'cafeteria_id': lambda x: str(x)})
-    dfd = pd.read_csv(r'latest_nutrition_table.csv', converters={'cafeteria_id': lambda x: str(x)})
+    dfd = pd.read_csv(r'master_nutrition\nutrition_table.csv', converters={'cafeteria_id': lambda x: str(x)})
     #dfm = pd.read_excel(r'menu\MenuWorks_Week_at_a_0AA22C06-D72C-48B4-9498-F6FBC87E079F.xlsx', skiprows=11)
     dfm = pd.read_excel(r'menu\MenuWorks_W11_2022.xlsx', skiprows=11)
    
