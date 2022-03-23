@@ -33,6 +33,12 @@ def clean_nutrient1(z):
         z = z.strip('+')
         return float(z)
 
+def clean_category(z):
+    null = None
+    if z == '-':
+        return null
+    else:
+        return z.lower()
 
 bad_units = set()
 
@@ -49,8 +55,12 @@ def clean_portion(z):
         return eval(z.strip('tsp')) * 4.92892
     elif m := re.search(rf'floz', z):
         return eval(z.strip('floz')) * 29.5735
-    elif m := re.search(rf'oz', z):
-        return eval(z.strip('oz')) * 29.5735
+    elif m:= re.search(rf'oz', z):
+        if re.search(rf'portion', z) is None and re.search(rf'ladle', z) is None:
+            return eval(z.strip('oz')) * 29.5735
+        else:
+            bad_units.add(z)
+            return null
     else:
         bad_units.add(z)
         return null
@@ -58,9 +68,15 @@ def clean_portion(z):
 
 def nutrition_fact_table(df, df1):
     df = clean_nutrition_table_tail(df)
-    df.drop(['Magnesium (mg)', 'Weight (oz)', 'Calories from Fat'], axis=1, inplace=True)
+    try:
+        df.drop(['Magnesium (mg)', 'Weight (oz)', 'Calories from Fat'], axis=1, inplace=True)
+    except:
+        df.drop(['Weight (oz)', 'Cholesterol (mg)'], axis=1, inplace=True)
 
-    rows_nan = np.array(df.isnull().any(axis=1))
+    k = list(df.keys())
+    k.remove('Recipe Name')
+    k.remove('Category')
+    rows_nan = np.array(df[k].isnull().all(axis=1))
     section_rows = list(np.where(rows_nan == True)[0])
     MEAL_TYPES = []
     for i in range(len(section_rows)):
@@ -100,7 +116,10 @@ def nutrition_fact_table(df, df1):
 
     df_all.drop_duplicates(inplace=True)
     df_all = df_all.reset_index(drop=True)
-    df_all['category'] = df_all['category'].apply(lambda z: z.lower())
+ 
+    df_all['category']=df_all['category'].fillna('-')
+    df_all['category'] = df_all['category'].apply(lambda z: clean_category(z))
+    
 
     df_all['vitamin_c'] = df_all['vitamin_c'].apply(lambda z: clean_nutrient1(str(z)))
     df_all['vitamin_d'] = df_all['vitamin_d'].apply(lambda z: clean_nutrient1(str(z)))
@@ -108,6 +127,7 @@ def nutrition_fact_table(df, df1):
     df_all['calcium'] = df_all['calcium'].apply(lambda z: clean_nutrient1(str(z)))
     df_all['potassium'] = df_all['potassium'].apply(lambda z: clean_nutrient1(str(z)))
 
+    df_all['saturated_fat'] = df_all['saturated_fat'].apply(lambda z: clean_nutrient1(str(z)))
     df_all['iron'] = df_all['iron'].apply(lambda z: clean_nutrient1(str(z)))
     df_all['cholesterol'] = df_all['cholesterol'].apply(lambda z: clean_nutrient1(str(z)))
     df_all['fiber'] = df_all['fiber'].apply(lambda z: clean_nutrient1(str(z)))
@@ -118,6 +138,7 @@ def nutrition_fact_table(df, df1):
     df_all['portion_volume'] = df_all['portion_volume'].apply(lambda z: clean_portion(z))
     df_all['portion_weight'] = df_all['portion_weight'].apply(lambda z: float(z.strip('g')))
 
+  
     df_all['station'] = df_all['station'].apply(lambda z: z.split('-')[1].strip())
 
     df_all.drop(df_all[df_all.portion_volume.isnull()].index, inplace=True)
@@ -148,8 +169,10 @@ def parse_fixture(d, out_filename):
 
 
 def main():
-    df = pd.read_excel(r'nutrition/MenuWorks_FDA_Menu_Main_W9-11_2022.xlsx', skiprows=11)
-    dfa = pd.read_excel(r'nutrition/MenuWorks_FDA_Menu_Alt_W9-11_2022.xlsx', skiprows=11)
+    df = pd.read_excel(r'nutrition/MenuWorks_FDA_Menu_Main_W11_2022.xlsx', skiprows=11, 
+    converters={'Recipe Number': lambda x: str(x), 'category': lambda x: str(x)})
+    dfa = pd.read_excel(r'nutrition/MenuWorks_FDA_Menu_Alt_W11_2022.xlsx', skiprows=11,
+    converters={'Recipe Number': lambda x: str(x)})
 
     df, dfa, df_combine = nutrition_fact_table(df, dfa)
     df_combine['pk'] = range(1000, 1000 + len(df_combine))
