@@ -34,14 +34,6 @@ def clean_nutrient1(z):
         return float(z)
 
 
-def clean_category(z):
-    null = None
-    if z == '-':
-        return null
-    else:
-        return z.lower()
-
-
 bad_units = set()
 
 
@@ -68,9 +60,7 @@ def nutrition_fact_table(df, df1):
     df = clean_nutrition_table_tail(df)
     df.drop(['Magnesium (mg)', 'Weight (oz)', 'Calories from Fat'], axis=1, inplace=True)
 
-    k = list(df.keys())
-    k.remove('Recipe Name')
-    rows_nan = np.array(df[k].isnull().all(axis=1))
+    rows_nan = np.array(df.isnull().any(axis=1))
     section_rows = list(np.where(rows_nan == True)[0])
     MEAL_TYPES = []
     for i in range(len(section_rows)):
@@ -88,7 +78,7 @@ def nutrition_fact_table(df, df1):
     keys['Recipe Name'] = 'name'
     keys['Recipe Number'] = 'cafeteria_id'
     keys['Portion Size'] = 'portion_volume'
-    keys['Weight (g)'] = 'portion_size'
+    keys['Weight (g)'] = 'portion_weight'
     keys['Dietary Fiber (g)'] = 'fiber'
     keys['Total Carb (g)'] = 'carbohydrate'
     keys['Total Sugars (g)'] = 'sugar'
@@ -102,16 +92,15 @@ def nutrition_fact_table(df, df1):
     keys1['Recipe Name'] = 'name'
     keys1['Recipe Number'] = 'cafeteria_id'
     keys1['Portion Size'] = 'portion_volume'
-    keys1['Weight (g)'] = 'portion_size'
+    keys1['Weight (g)'] = 'portion_weight'
     df1 = df1.rename(columns=keys1)
 
-    df_all = pd.merge(df, df1, on=['cafeteria_id', 'portion_size'], how='left',
+    df_all = pd.merge(df, df1, on=['cafeteria_id', 'portion_weight'], how='left',
                       suffixes=('', '_y')).drop(['name_y', 'portion_volume_y'], axis=1)
 
     df_all.drop_duplicates(inplace=True)
     df_all = df_all.reset_index(drop=True)
-    df_all['category'] = df_all['category'].fillna('-')
-    df_all['category'] = df_all['category'].apply(lambda z: clean_category(z))
+    df_all['category'] = df_all['category'].apply(lambda z: z.lower())
 
     df_all['vitamin_c'] = df_all['vitamin_c'].apply(lambda z: clean_nutrient1(str(z)))
     df_all['vitamin_d'] = df_all['vitamin_d'].apply(lambda z: clean_nutrient1(str(z)))
@@ -131,6 +120,9 @@ def nutrition_fact_table(df, df1):
 
     df_all['station'] = df_all['station'].apply(lambda z: z.split('-')[1].strip())
 
+    df_all.drop(df_all[df_all.portion_volume.isnull()].index, inplace=True)
+    df_all = df_all.reset_index(drop=True)
+
     df_all = df_all.replace({np.nan: None})
 
     return df, df1, df_all
@@ -141,11 +133,11 @@ def parse_fixture(d, out_filename):
     json_list = []
 
     for r in range(len(result)):
-        data = {'model': 'backend.MealItem', 'pk': {}, 'fields': {}}
+        data = {'model': 'backend.MealItem', 'pk': {}, 'field': {}}
         f = result[r]
         data['pk'] = f['pk']
         f.pop('pk')
-        data['fields'] = f
+        data['field'] = f
         json_list.append(data)
 
     with open(out_filename, 'w') as out_file:
@@ -154,15 +146,12 @@ def parse_fixture(d, out_filename):
 
 
 def main():
-    df = pd.read_excel(r'nutrition/MenuWorks_FDA_Menu_Main_W9-11_2022.xlsx', skiprows=11,
-                       converters={'Recipe Number': lambda x: str(x)})
-    dfa = pd.read_excel(r'nutrition/MenuWorks_FDA_Menu_Alt_W9-11_2022.xlsx', skiprows=11,
-                        converters={'Recipe Number': lambda x: str(x)})
+    df = pd.read_excel(r'nutrition/MenuWorks_FDA_Menu_Main_W9-11_2022.xlsx', skiprows=11)
+    dfa = pd.read_excel(r'nutrition/MenuWorks_FDA_Menu_Alt_W9-11_2022.xlsx', skiprows=11)
 
     df, dfa, df_combine = nutrition_fact_table(df, dfa)
     df_combine['pk'] = range(1000, 1000 + len(df_combine))
     df_combine['school'] = [SCHOOL_ID for ii in range(len(df_combine))]
-    df_combine.to_csv('Nutrition_Table_W9-11_2022.csv')
     parse_fixture(df_combine, OUT_FILE_PATH)
 
 
