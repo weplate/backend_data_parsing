@@ -4,7 +4,8 @@ import re
 import json
 
 OUT_FILE_PATH = 'meal_items.json'
-NUTRITION_TABLE = 'master_nutrition/nutrition_table.csv'
+NUTRITION_TABLE_LPRIOR_UPDATED = 'master_nutrition/nutrition_table_backup.csv'
+NUTRITION_TABLE_LATEST = 'master_nutrition/nutrition_table.csv'
 SCHOOL_ID = 10
 
 
@@ -177,19 +178,16 @@ def main():
     dfa = pd.read_excel(r'nutrition/MenuWorks_FDA_Menu_Alt_W11_2022.xlsx', skiprows=11,
     converters={'Recipe Number': lambda x: str(x)})
 
-    #df = pd.read_excel(r'nutrition/MenuWorks_FDA_Menu_Main_W9-11_2022.xlsx', skiprows=11, 
-    #converters={'Recipe Number': lambda x: str(x), 'category': lambda x: str(x)})
-    #dfa = pd.read_excel(r'nutrition/MenuWorks_FDA_Menu_Alt_W9-11_2022.xlsx', skiprows=11,
-    #converters={'Recipe Number': lambda x: str(x)})
     try:
-        dfn = pd.read_csv(NUTRITION_TABLE)
+        dfn = pd.read_csv(NUTRITION_TABLE_LATEST)
+        dfn.to_csv(NUTRITION_TABLE_LPRIOR_UPDATED,index=False) #save a backup of one version older
         dfn.drop(['pk', 'school'], axis=1, inplace=True)
     except:
         dfn = pd.DataFrame()
     df, dfa, df_combine = nutrition_fact_table(df, dfa, dfn)
     df_combine['pk'] = range(1000, 1000 + len(df_combine))
     df_combine['school'] = [SCHOOL_ID for ii in range(len(df_combine))]
-    df_combine.to_csv(NUTRITION_TABLE, index=False)
+    df_combine.to_csv(NUTRITION_TABLE_LATEST, index=False)
     parse_fixture(df_combine, OUT_FILE_PATH)
 
 
