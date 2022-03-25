@@ -163,7 +163,6 @@ def parse_fixture(d, out_filename):
         f = result[r]
         data['pk'] = f['pk']
         f.pop('pk')
-        f['version'] = 101
         data['fields'] = f
         json_list.append(data)
 
