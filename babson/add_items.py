@@ -149,6 +149,8 @@ def nutrition_fact_table(df, df1, dfn):
 
     df_all = df_all.replace({np.nan: 0})
     df_all = pd.concat([dfn, df_all]).drop_duplicates().reset_index(drop=True)
+    df_all.drop_duplicates(subset=['cafeteria_id'], keep='first', inplace=True)
+    df_all = df_all.reset_index(drop=True)
     #df_all = df_all.replace({np.nan: None})
 
     return df, df1, df_all
@@ -179,12 +181,13 @@ def main():
     converters={'Recipe Number': lambda x: str(x)})
 
     try:
-        dfn = pd.read_csv(NUTRITION_TABLE_LATEST)
+        dfn = pd.read_csv(NUTRITION_TABLE_LATEST, converters={'cafeteria_id': lambda x: str(x), 'category': lambda x: str(x)})
         dfn.to_csv(NUTRITION_TABLE_LPRIOR_UPDATED,index=False) #save a backup of one version older
         dfn.drop(['pk', 'school'], axis=1, inplace=True)
     except:
         dfn = pd.DataFrame()
     df, dfa, df_combine = nutrition_fact_table(df, dfa, dfn)
+    print(len(df_combine))
     df_combine['pk'] = range(1000, 1000 + len(df_combine))
     df_combine['school'] = [SCHOOL_ID for ii in range(len(df_combine))]
     df_combine.to_csv(NUTRITION_TABLE_LATEST, index=False)
