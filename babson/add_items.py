@@ -122,7 +122,6 @@ def nutrition_fact_table(df, df1, dfn):
  
     df_all['category']=df_all['category'].fillna('-')
     df_all['category'] = df_all['category'].apply(lambda z: clean_category(z))
-    
 
     df_all['vitamin_c'] = df_all['vitamin_c'].apply(lambda z: clean_nutrient1(str(z)))
     df_all['vitamin_d'] = df_all['vitamin_d'].apply(lambda z: clean_nutrient1(str(z)))
@@ -142,6 +141,9 @@ def nutrition_fact_table(df, df1, dfn):
     df_all['portion_weight'] = df_all['portion_weight'].apply(lambda z: float(z.strip('g')))
 
     df_all['station'] = df_all['station'].apply(lambda z: z.split('-')[1].strip())
+
+    df_all.drop(df_all[df_all.category.isnull()].index, inplace=True)
+    df_all = df_all.reset_index(drop=True)
 
     df_all.drop(df_all[df_all.portion_volume.isnull()].index, inplace=True)
     df_all = df_all.reset_index(drop=True)
@@ -183,14 +185,18 @@ def main():
     #converters={'Recipe Number': lambda x: str(x), 'category': lambda x: str(x)})
     #dfa = pd.read_excel(r'nutrition/MenuWorks_FDA_Menu_Alt_W9-11_2022.xlsx', skiprows=11,
     #converters={'Recipe Number': lambda x: str(x)})
+
+    dfn = pd.DataFrame()
     try:
         dfn = pd.read_csv(NUTRITION_TABLE_LATEST, converters={'cafeteria_id': lambda x: str(x), 'category': lambda x: str(x)})
         dfn.to_csv(NUTRITION_TABLE_PRIOR_UPDATED,index=False) #save a backup of one version older
         dfn.drop(['pk', 'school'], axis=1, inplace=True)
     except:
-        dfn = pd.DataFrame()
+        pass
     df, dfa, df_combine = nutrition_fact_table(df, dfa, dfn)
     print('total len: ', len(df_combine))
+    #dupes = df_combine['name'].duplicated() and not df_combine['name'].duplicaetd()
+    
     df_combine['pk'] = range(1000, 1000 + len(df_combine))
     df_combine['school'] = [SCHOOL_ID for ii in range(len(df_combine))]
     df_combine.to_csv(NUTRITION_TABLE_LATEST, index=False)

@@ -108,6 +108,7 @@ def weekly_menu_dict(dfm, dfd, row_begin, row_end):
     MENU_WEEKLY['week_num'] = weeknums
     MENU_WEEKLY['items_recipe_num'] = meals_recipe_num
     
+    #MENU_WEEKLY['items'] = MENU_WEEKLY['items'].apply(lambda x: eval(x))
     MENU_WEEKLY['items'] = MENU_WEEKLY['items'].apply(lambda x: list(map(int, x)))
     return MENU_WEEKLY, dfmw
 
@@ -147,7 +148,7 @@ def main():
         df_master = pd.read_csv(MENU_LATEST)
         df_master.to_csv(MENU_PRIOR_UPDATED,index=False) #save a backup of one version older
         df_master.drop(['pk'], axis=1, inplace=True)
-        df_master['items'] = df_master['items'].apply(lambda x: x.tolist())
+        df_master['items'] = df_master['items'].apply(lambda x: eval(x))
     except:
         pass
 
