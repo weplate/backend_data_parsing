@@ -141,7 +141,6 @@ def nutrition_fact_table(df, df1, dfn):
     df_all['portion_volume'] = df_all['portion_volume'].apply(lambda z: clean_portion(z))
     df_all['portion_weight'] = df_all['portion_weight'].apply(lambda z: float(z.strip('g')))
 
-  
     df_all['station'] = df_all['station'].apply(lambda z: z.split('-')[1].strip())
 
     df_all.drop(df_all[df_all.portion_volume.isnull()].index, inplace=True)

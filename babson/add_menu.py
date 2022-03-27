@@ -142,13 +142,14 @@ def main():
             split_row.append(i)
 
     MENU = pd.DataFrame()
+    df_master = pd.DataFrame()
     try:
         df_master = pd.read_csv(MENU_LATEST)
         df_master.to_csv(MENU_PRIOR_UPDATED,index=False) #save a backup of one version older
         df_master.drop(['pk'], axis=1, inplace=True)
         df_master['items'] = df_master['items'].apply(lambda x: x.tolist())
     except:
-        df_master = pd.DataFrame()
+        pass
 
     for mm in range(len(split_row)):
         if mm == (len(split_row)-1):
@@ -157,6 +158,7 @@ def main():
             menuw1, dfmw1 = weekly_menu_dict(dfm, dfd, split_row[mm], split_row[mm + 1])
         MENU = pd.concat([MENU, menuw1]).reset_index(drop=True)
         
+
     df_master = pd.concat([df_master, MENU]).reset_index(drop=True)
     df_master.drop_duplicates(subset=['name'], keep='last',inplace=True, ignore_index=True)
     df_master ['pk'] = range(1000, 1000 + len(df_master))
