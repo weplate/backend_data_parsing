@@ -6,6 +6,9 @@ venv/
 # IDE
 .idea/
 
+# Debug
+.Debug_Test/
+
 # Output files
 babson/meal_items.json
 babson/menu_items.json

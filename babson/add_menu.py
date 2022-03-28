@@ -107,9 +107,9 @@ def weekly_menu_dict(dfm, dfd, row_begin, row_end):
     MENU_WEEKLY['items'] = meals
     MENU_WEEKLY['week_num'] = weeknums
     MENU_WEEKLY['items_recipe_num'] = meals_recipe_num
-    
-    #MENU_WEEKLY['items'] = MENU_WEEKLY['items'].apply(lambda x: eval(x))
+
     MENU_WEEKLY['items'] = MENU_WEEKLY['items'].apply(lambda x: list(map(int, x)))
+    MENU_WEEKLY.drop(MENU_WEEKLY[MENU_WEEKLY['items_recipe_num'].str.len() == 0].index, inplace=True)
     return MENU_WEEKLY, dfmw
 
 def parse_fixture(d, out_filename):
