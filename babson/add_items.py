@@ -60,11 +60,14 @@ def clean_portion(z):
     elif m:= re.search(rf'oz', z):
         if re.search(rf'portion', z) is None and re.search(rf'ladle', z) is None:
             return eval(z.strip('oz')) * 29.5735
-        else:
-            bad_units.add(z)
-            return null
     else:
         bad_units.add(z)
+        patterns = ['each', 'plate', 'serving\(s\)', 'slice', 'sandwich', 'ounce', 'half', 'wedge', 'piece', 'oz portion', 'ucp']
+        for p in patterns:
+            if m := re.search(p, z):
+                return -1*eval(z.strip(p))
+        if m:= re.search('Scoop', z):
+            return -1*eval(z.split('Scoop')[0])                
         return null
 
 
