@@ -62,7 +62,7 @@ def clean_portion(z):
             return eval(z.strip('oz')) * 29.5735
     else:
         bad_units.add(z)
-        patterns = ['each', 'plate', 'serving\(s\)', 'slice', 'sandwich', 'ounce', 'half', 'wedge', 'piece', 'oz portion', 'ucp']
+        patterns = ['each', 'plate', 'serving\(s\)', 'slice', 'sandwich', 'half', 'wedge', 'piece', 'ucp']
         for p in patterns:
             if m := re.search(p, z):
                 return -1*eval(z.strip(p))
