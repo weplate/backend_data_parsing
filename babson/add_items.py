@@ -131,6 +131,9 @@ def nutrition_fact_table(df, df1, dfn):
     df_all['vitamin_a'] = df_all['vitamin_a'].apply(lambda z: clean_nutrient1(str(z)))
     df_all['calcium'] = df_all['calcium'].apply(lambda z: clean_nutrient1(str(z)))
     df_all['potassium'] = df_all['potassium'].apply(lambda z: clean_nutrient1(str(z)))
+    df_all['sodium'] = df_all['sodium'].apply(lambda z: clean_nutrient1(str(z)))
+    df_all['total_fat'] = df_all['total_fat'].apply(lambda z: clean_nutrient1(str(z)))
+    df_all['calories'] = df_all['calories'].apply(lambda z: clean_nutrient1(str(z)))
 
     df_all['saturated_fat'] = df_all['saturated_fat'].apply(lambda z: clean_nutrient1(str(z)))
     df_all['iron'] = df_all['iron'].apply(lambda z: clean_nutrient1(str(z)))
