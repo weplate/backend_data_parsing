@@ -49,6 +49,8 @@ def clean_portion(z):
     null = None
     if m := re.search(rf'[cx]up', z):
         return eval(z.strip('[cx]up')) * 236.588
+    elif m := re.search(rf'ucp', z):
+        return eval(z.strip('ucp')) * 236.588
     elif m := re.search(rf'pint', z):
         return eval(z.strip('pint')) * 473
     elif m := re.search(rf'tbsp', z):
@@ -62,7 +64,7 @@ def clean_portion(z):
             return eval(z.strip('oz')) * 29.5735
     else:
         bad_units.add(z)
-        patterns = ['each', 'plate', 'serving\(s\)', 'slice', 'sandwich', 'half', 'wedge', 'piece', 'ucp']
+        patterns = ['each', 'plate', 'serving\(s\)', 'slice', 'sandwich', 'half', 'wedge', 'piece']
         for p in patterns:
             if m := re.search(p, z):
                 return -1*eval(z.strip(p))
