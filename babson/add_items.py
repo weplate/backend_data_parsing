@@ -72,8 +72,26 @@ def clean_portion(z):
             return -1*eval(z.split('Scoop')[0])                
         return null
 
+def discrete_food_row(row, dis_dict):
+    null = None
+    special_discrete_patterns = ['sandwich', 'serving\(s\)', 'plate']
+    discrete_patterns = ['each', 'slice', 'half', 'wedge', 'piece', '\d"x\d"']
+    for p in special_discrete_patterns:
+        if p in row['portion_volume']:
+            return 1
+    for p in discrete_patterns:
+        if re.match(row['portion_volume'], p):
+            for keys, value in dis_dict.items():
+                if keys.lower() in row['name'].lower():
+                    return value['Maximum Count']
+    return null
 
-def nutrition_fact_table(df, df1, dfn):
+def discrete_food_clean(df, dis_dict):
+    discrete_item = []
+    for index, r in df.iterrows():
+        discrete_item.append(discrete_food_row(r, dis_dict))
+
+def nutrition_fact_table(df, df1, dfn, dis_df_dict):
     df = clean_nutrition_table_tail(df)
     try:
         df.drop(['Magnesium (mg)', 'Weight (oz)', 'Calories from Fat'], axis=1, inplace=True)
@@ -145,6 +163,7 @@ def nutrition_fact_table(df, df1, dfn):
     df_all['sugar'] = df_all['sugar'].apply(lambda z: clean_nutrient1(str(z)))
     df_all['carbohydrate'] = df_all['carbohydrate'].apply(lambda z: clean_nutrient1(str(z)))
 
+    df_all['max_pieces'] = discrete_food_clean(df_all, dis_df_dict)
     df_all['portion_volume'] = df_all['portion_volume'].apply(lambda z: clean_portion(z))
     df_all['portion_weight'] = df_all['portion_weight'].apply(lambda z: float(z.strip('g')))
 
@@ -193,6 +212,10 @@ def main():
     #dfa = pd.read_excel(r'nutrition/MenuWorks_FDA_Menu_Alt_W9-11_2022.xlsx', skiprows=11,
     #converters={'Recipe Number': lambda x: str(x)})
 
+    df_discrete = pd.read_csv(DISCRETE)
+    df_discrete = df_discrete.set_index('Dis_Category')
+    dis_df_dict = df_discrete.to_dict('index')
+
     dfn = pd.DataFrame()
     try:
         dfn = pd.read_csv(NUTRITION_TABLE_LATEST, converters={'cafeteria_id': lambda x: str(x), 'category': lambda x: str(x)})
@@ -200,7 +223,7 @@ def main():
         dfn.drop(['pk', 'school'], axis=1, inplace=True)
     except:
         pass
-    df, dfa, df_combine = nutrition_fact_table(df, dfa, dfn)
+    df, dfa, df_combine = nutrition_fact_table(df, dfa, dfn, dis_df_dict)
     print('total len: ', len(df_combine))
     #dupes = df_combine['name'].duplicated() and not df_combine['name'].duplicaetd()
     
