@@ -6,6 +6,7 @@ import json
 OUT_FILE_PATH = 'meal_items.json'
 NUTRITION_TABLE_PRIOR_UPDATED = 'master_nutrition/nutrition_table_backup.csv'
 NUTRITION_TABLE_LATEST = 'master_nutrition/nutrition_table.csv'
+DISCRETE = 'Discrete_food/discrete_food_range.csv'
 SCHOOL_ID = 10
 
 
