@@ -81,7 +81,7 @@ def discrete_food_row(row, dis_dict):
         if p in row['portion_volume']:
             return 1
     for p in discrete_patterns:
-        if re.match(row['portion_volume'], p):
+        if re.search(p, row['portion_volume']):
             for keys, value in dis_dict.items():
                 if keys.lower() in row['name'].lower():
                     return value['Maximum Count']
@@ -91,6 +91,7 @@ def discrete_food_clean(df, dis_dict):
     discrete_item = []
     for index, r in df.iterrows():
         discrete_item.append(discrete_food_row(r, dis_dict))
+    return discrete_item
 
 def nutrition_fact_table(df, df1, dfn, dis_df_dict):
     df = clean_nutrition_table_tail(df)
