@@ -133,7 +133,8 @@ def parse_fixture(d, out_filename):
 def main():
     dfd = pd.read_csv(r'master_nutrition\nutrition_table.csv', converters={'cafeteria_id': lambda x: str(x)})
     #dfm = pd.read_excel(r'menu\MenuWorks_W9-12_2022.xlsx', skiprows=11)
-    dfm = pd.read_excel(r'menu\MenuWorks_W11-13_2022.xlsx', skiprows=11)
+    #dfm = pd.read_excel(r'menu\MenuWorks_W11-13_2022.xlsx', skiprows=11)
+    dfm = pd.read_excel(r'menu\MenuWorks_W14-15_2022.xlsx', skiprows=11)
 
     dfm = clean_table(dfm)
 

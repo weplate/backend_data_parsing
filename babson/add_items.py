@@ -62,7 +62,7 @@ def clean_portion(z):
         return eval(z.strip('floz')) * 29.5735
     elif m:= re.search(rf'oz', z):
         if re.search(rf'portion', z) is None and re.search(rf'ladle', z) is None:
-            return eval(z.strip('oz')) * 29.5735
+            return eval(z.split('oz')[0]) * 29.5735
     else:
         bad_units.add(z)
         patterns = ['each', 'plate', 'serving\(s\)', 'slice', 'sandwich', 'half', 'wedge', 'piece']
@@ -98,8 +98,8 @@ def nutrition_fact_table(df, df1, dfn, dis_df_dict):
     try:
         df.drop(['Magnesium (mg)', 'Weight (oz)', 'Calories from Fat'], axis=1, inplace=True)
     except:
-        #df.drop(['Weight (oz)'], axis=1, inplace=True)
-        df.drop(['Weight (oz)', 'Cholesterol (mg)'], axis=1, inplace=True)
+        df.drop(['Weight (oz)'], axis=1, inplace=True)
+        #df.drop(['Weight (oz)', 'Cholesterol (mg)'], axis=1, inplace=True)
 
     k = list(df.keys())
     k.remove('Recipe Name')
@@ -204,10 +204,16 @@ def parse_fixture(d, out_filename):
 
 
 def main():
-    df = pd.read_excel(r'nutrition/MenuWorks_FDA_Menu_Main_W11_2022.xlsx', skiprows=11, 
+
+    df = pd.read_excel(r'nutrition/MenuWorks_FDA_Menu_Main_W14-15_2022.xlsx', skiprows=11, 
     converters={'Recipe Number': lambda x: str(x), 'category': lambda x: str(x)})
-    dfa = pd.read_excel(r'nutrition/MenuWorks_FDA_Menu_Alt_W11_2022.xlsx', skiprows=11,
+    dfa = pd.read_excel(r'nutrition/MenuWorks_FDA_Menu_Alt_W14-15_2022.xlsx', skiprows=11,
     converters={'Recipe Number': lambda x: str(x)})
+
+    #df = pd.read_excel(r'nutrition/MenuWorks_FDA_Menu_Main_W11_2022.xlsx', skiprows=11, 
+    #converters={'Recipe Number': lambda x: str(x), 'category': lambda x: str(x)})
+    #dfa = pd.read_excel(r'nutrition/MenuWorks_FDA_Menu_Alt_W11_2022.xlsx', skiprows=11,
+    #converters={'Recipe Number': lambda x: str(x)})
 
     #df = pd.read_excel(r'nutrition/MenuWorks_FDA_Menu_Main_W9-11_2022.xlsx', skiprows=11, 
     #converters={'Recipe Number': lambda x: str(x), 'category': lambda x: str(x)})
